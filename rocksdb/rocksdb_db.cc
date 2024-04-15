@@ -18,7 +18,7 @@
 #include <rocksdb/status.h>
 #include <rocksdb/utilities/options_util.h>
 #include <rocksdb/write_batch.h>
-
+#include <rocksdb/table.h>
 namespace {
   const std::string PROP_NAME = "rocksdb.dbname";
   const std::string PROP_NAME_DEFAULT = "";
@@ -106,6 +106,15 @@ namespace {
 
   static std::shared_ptr<rocksdb::Env> env_guard;
   static std::shared_ptr<rocksdb::Cache> block_cache;
+
+  const std::string PROP_NVM_USE ="rocksdb.nvm_use";
+  const std::string PROP_NVM_USE_DEFAULT="false";
+
+  const std::string PROP_NVM_PMEM_PATH="rocksdb.pmem_path";
+  const std::string PROP_NVM_PMEM_PATH_DEFAULT="/mnt/pmemdir/";
+
+
+
 #if ROCKSDB_MAJOR < 8
   static std::shared_ptr<rocksdb::Cache> block_cache_compressed;
 #endif
@@ -236,26 +245,26 @@ void RocksdbDB::GetOptions(const utils::Properties &props, rocksdb::Options *opt
                            std::vector<rocksdb::ColumnFamilyDescriptor> *cf_descs) {
   std::string env_uri = props.GetProperty(PROP_ENV_URI, PROP_ENV_URI_DEFAULT);
   std::string fs_uri = props.GetProperty(PROP_FS_URI, PROP_FS_URI_DEFAULT);
-  rocksdb::Env* env =  rocksdb::Env::Default();;
-  if (!env_uri.empty() || !fs_uri.empty()) {
+  rocksdb::Env* env =  rocksdb::Env::Default();
+  /*if (!env_uri.empty() || !fs_uri.empty()) {
     rocksdb::Status s = rocksdb::Env::CreateFromUri(rocksdb::ConfigOptions(),
                                                     env_uri, fs_uri, &env, &env_guard);
     if (!s.ok()) {
       throw utils::Exception(std::string("RocksDB CreateFromUri: ") + s.ToString());
     }
     opt->env = env;
-  }
+  }*/
 
   const std::string options_file = props.GetProperty(PROP_OPTIONS_FILE, PROP_OPTIONS_FILE_DEFAULT);
   if (options_file != "") {
-    rocksdb::ConfigOptions config_options;
+    /*rocksdb::ConfigOptions config_options;
     config_options.ignore_unknown_options = false;
     config_options.input_strings_escaped = true;
     config_options.env = env;
     rocksdb::Status s = rocksdb::LoadOptionsFromFile(config_options, options_file, opt, cf_descs);
     if (!s.ok()) {
       throw utils::Exception(std::string("RocksDB LoadOptionsFromFile: ") + s.ToString());
-    }
+    }*/
   } else {
     const std::string compression_type = props.GetProperty(PROP_COMPRESSION,
                                                            PROP_COMPRESSION_DEFAULT);
@@ -291,7 +300,7 @@ void RocksdbDB::GetOptions(const utils::Properties &props, rocksdb::Options *opt
     if (val != 0) {
       opt->target_file_size_multiplier = val;
     }
-    val = std::stoi(props.GetProperty(PROP_MAX_BYTES_FOR_LEVEL_BASE, PROP_MAX_BYTES_FOR_LEVEL_BASE_DEFAULT));
+    val = std::stoll(props.GetProperty(PROP_MAX_BYTES_FOR_LEVEL_BASE, PROP_MAX_BYTES_FOR_LEVEL_BASE_DEFAULT));
     if (val != 0) {
       opt->max_bytes_for_level_base = val;
     }
@@ -364,6 +373,15 @@ void RocksdbDB::GetOptions(const utils::Properties &props, rocksdb::Options *opt
     if (props.GetProperty(PROP_OPTIMIZE_LEVELCOMP, PROP_OPTIMIZE_LEVELCOMP_DEFAULT) == "true") {
       opt->OptimizeLevelStyleCompaction();
     }
+    if (props.GetProperty(PROP_NVM_USE,PROP_NVM_USE_DEFAULT)=="true"){
+        auto nvm_setup = new rocksdb::NvmSetup();
+        nvm_setup->use_nvm_module = true;
+        //nvm_setup->reset_nvm_storage = FLAGS_reset_nvm_storage;
+        nvm_setup->pmem_path = props.GetProperty(PROP_NVM_PMEM_PATH,PROP_NVM_PMEM_PATH_DEFAULT);
+        //nvm_setup->pmem_size = FLAGS_pmem_size;
+        opt->nvm_setup.reset(nvm_setup);
+    }
+
   }
 }
 

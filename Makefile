@@ -42,7 +42,7 @@ ifeq ($(BIND_WIREDTIGER), 1)
 endif
 
 ifeq ($(BIND_LEVELDB), 1)
-	LDFLAGS += -lleveldb
+	LDFLAGS += -lleveldb -lpmem -lsnappy
 	SOURCES += $(wildcard leveldb/*.cc)
 endif
 
