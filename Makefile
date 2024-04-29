@@ -46,6 +46,12 @@ ifeq ($(BIND_LEVELDB), 1)
 	SOURCES += $(wildcard leveldb/*.cc)
 endif
 
+ifeq ($(BIND_NOVELSMDB), 1)
+	CXXFLAGS+= -I /home/hxy/lsm_nvm/include/
+	LDFLAGS += -L /home/hxy/lsm_nvm/out-static -lnovelsmdb   -lsnappy  -lnuma
+	SOURCES += $(wildcard novelsmdb/*.cc)
+endif
+
 ifeq ($(BIND_ROCKSDB), 1)
 	LDFLAGS += -lrocksdb
 	SOURCES += $(wildcard rocksdb/*.cc)

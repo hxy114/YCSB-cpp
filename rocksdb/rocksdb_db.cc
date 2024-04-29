@@ -12,6 +12,7 @@
 #include "core/db_factory.h"
 #include "utils/utils.h"
 
+#include <iostream>
 #include <rocksdb/cache.h>
 #include <rocksdb/filter_policy.h>
 #include <rocksdb/merge_operator.h>
@@ -348,11 +349,14 @@ void RocksdbDB::GetOptions(const utils::Properties &props, rocksdb::Options *opt
     }
 
     rocksdb::BlockBasedTableOptions table_options;
+    table_options.no_block_cache=true;
     size_t cache_size = std::stoul(props.GetProperty(PROP_CACHE_SIZE, PROP_CACHE_SIZE_DEFAULT));
     if (cache_size > 0) {
       block_cache = rocksdb::NewLRUCache(cache_size);
       table_options.block_cache = block_cache;
+      table_options.no_block_cache=false;
     }
+    std::cout<<table_options.no_block_cache<<"   "<<cache_size<<std::endl;
 #if ROCKSDB_MAJOR < 8
     size_t compressed_cache_size = std::stoul(props.GetProperty(PROP_COMPRESSED_CACHE_SIZE,
                                                                 PROP_COMPRESSED_CACHE_SIZE_DEFAULT));
@@ -381,6 +385,7 @@ void RocksdbDB::GetOptions(const utils::Properties &props, rocksdb::Options *opt
         //nvm_setup->pmem_size = FLAGS_pmem_size;
         opt->nvm_setup.reset(nvm_setup);
     }
+    opt->row_cache= nullptr;
 
   }
 }
