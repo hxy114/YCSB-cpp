@@ -23,7 +23,7 @@ sudo rm -rf /mnt/pmemdir/pm_log
 sudo sh -c "/usr/bin/echo 3 > /proc/sys/vm/drop_caches"
 sleep 60
 sudo echo "./ycsb -load -run -db leveldb -P workloads/workloadc -P leveldb/leveldb.properties -s " >> partitionkv_ssd_kv.log
-sudo ./ycsb -load -run -db partition-r -P workloads/workloadc -P partition-r/rocksdb.properties-s >>partitionkv_ssd_kv.log
+sudo ./ycsb -load -run -db partition-r -P workloads/workloadc -P partition-r/rocksdb.properties -s >>partitionkv_ssd_kv.log
 
 
 
