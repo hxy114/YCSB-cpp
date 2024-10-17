@@ -57,6 +57,11 @@ ifeq ($(BIND_ROCKSDB), 1)
 	SOURCES += $(wildcard rocksdb/*.cc)
 endif
 
+ifeq ($(BIND_PARTITION), 1)
+	LDFLAGS += -lrocksdb -ldl -lz -lsnappy -lzstd -lbz2 -llz4  -lpmem -lpmemobj
+	SOURCES += $(wildcard partition-r/*.cc)
+endif
+
 ifeq ($(BIND_LMDB), 1)
 	LDFLAGS += -llmdb
 	SOURCES += $(wildcard lmdb/*.cc)
