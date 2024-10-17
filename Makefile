@@ -53,7 +53,7 @@ ifeq ($(BIND_NOVELSMDB), 1)
 endif
 
 ifeq ($(BIND_ROCKSDB), 1)
-	LDFLAGS += -lrocksdb
+	LDFLAGS += -lrocksdb -ldl -lz -lsnappy -lzstd -lbz2 -llz4  -lpmem -lpmemobj
 	SOURCES += $(wildcard rocksdb/*.cc)
 endif
 
