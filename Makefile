@@ -47,8 +47,8 @@ ifeq ($(BIND_LEVELDB), 1)
 endif
 
 ifeq ($(BIND_NOVELSMDB), 1)
-	CXXFLAGS+= -I /home/hxy/lsm_nvm/include/
-	LDFLAGS += -L /home/hxy/lsm_nvm/out-static -lnovelsmdb   -lsnappy  -lnuma
+	CXXFLAGS+= -I /home/wujinyu/lsm_nvm/include/
+	LDFLAGS += -L /home/wujinyu/lsm_nvm/out-static -lleveldb   -lsnappy  -lnuma
 	SOURCES += $(wildcard novelsmdb/*.cc)
 endif
 
