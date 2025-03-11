@@ -114,7 +114,8 @@ namespace {
   static std::shared_ptr<rocksdb::Env> env_guard;
   static std::shared_ptr<rocksdb::Cache> block_cache;
 
-
+    const std::string PROP_SUB_COMPACTION="rocksdb.sub_compaction";
+    const std::string PROP_SUB_COMPACTION_DEFALT="1";
 
 
 
@@ -389,6 +390,11 @@ void RocksdbDB::GetOptions(const utils::Properties &props, rocksdb::Options *opt
     }
 
     opt->row_cache= nullptr;
+    val = std::stoi(props.GetProperty(PROP_SUB_COMPACTION, PROP_SUB_COMPACTION_DEFALT));
+    if (val != 0) {
+      opt->max_subcompactions = val;
+    }
+    std::cout<<opt->max_subcompactions<<std::endl;
 
   }
 }
