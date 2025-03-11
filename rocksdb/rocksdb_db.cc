@@ -114,6 +114,8 @@ namespace {
   const std::string PROP_NVM_PMEM_PATH="rocksdb.pmem_path";
   const std::string PROP_NVM_PMEM_PATH_DEFAULT="/mnt/pmemdir/";
 
+  const std::string PROP_SUB_COMPACTION="rocksdb.sub_compaction";
+  const std::string PROP_SUB_COMPACTION_DEFALT="1";
 
 
 #if ROCKSDB_MAJOR < 8
@@ -356,7 +358,7 @@ void RocksdbDB::GetOptions(const utils::Properties &props, rocksdb::Options *opt
       table_options.block_cache = block_cache;
       table_options.no_block_cache=false;
     }
-    std::cout<<table_options.no_block_cache<<"   "<<cache_size<<std::endl;
+
 #if ROCKSDB_MAJOR < 8
     size_t compressed_cache_size = std::stoul(props.GetProperty(PROP_COMPRESSED_CACHE_SIZE,
                                                                 PROP_COMPRESSED_CACHE_SIZE_DEFAULT));
@@ -386,7 +388,11 @@ void RocksdbDB::GetOptions(const utils::Properties &props, rocksdb::Options *opt
         opt->nvm_setup.reset(nvm_setup);
     }
     opt->row_cache= nullptr;
-
+    val = std::stoi(props.GetProperty(PROP_SUB_COMPACTION, PROP_SUB_COMPACTION_DEFALT));
+    if (val != 0) {
+      opt->max_subcompactions = val;
+    }
+    std::cout<<table_options.no_block_cache<<"   "<<cache_size<<opt->max_subcompactions<<std::endl;
   }
 }
 
