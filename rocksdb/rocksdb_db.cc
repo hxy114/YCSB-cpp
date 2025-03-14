@@ -291,7 +291,7 @@ void RocksdbDB::GetOptions(const utils::Properties &props, rocksdb::Options *opt
       throw utils::Exception("Unknown compression type");
     }
 
-    int val = std::stoi(props.GetProperty(PROP_MAX_BG_JOBS, PROP_MAX_BG_JOBS_DEFAULT));
+    long long int val = std::stoi(props.GetProperty(PROP_MAX_BG_JOBS, PROP_MAX_BG_JOBS_DEFAULT));
     if (val != 0) {
       opt->max_background_jobs = val;
     }
@@ -394,6 +394,7 @@ void RocksdbDB::GetOptions(const utils::Properties &props, rocksdb::Options *opt
     }
     std::cout<<table_options.no_block_cache<<"   "<<cache_size<<opt->max_subcompactions<<std::endl;
   }
+  opt->level_compaction_dynamic_level_bytes=false;
 }
 
 void RocksdbDB::SerializeRow(const std::vector<Field> &values, std::string &data) {
